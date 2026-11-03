@@ -16,8 +16,8 @@ An experimental pytorch reproduction of the following paper:
     - [Results](#results)
   - [2. Installation](#2-installation)
   - [3. Repository Structure](#3-repository-structure)
-  - [5. Training from Scratch](#5-training-from-scratch)
-  - [6. License](#6-license)
+  - [4. Training from Scratch](#4-training-from-scratch)
+  - [5. License](#5-license)
 
 ## 1. Overview
 
@@ -70,7 +70,7 @@ src/
 LICENSE
 ```
 
-## 5. Training from Scratch
+## 4. Training from Scratch
 Leave `pretrained=None`, set a positive `epochs` value, and run:
 
 ```bash
@@ -85,5 +85,5 @@ torchrun --standalone --nproc_per_node=2 src/train/train_PHY_AE.py
 
 The Slurm scripts contain cluster-specific paths and resource settings that need adapting. Use `channel="proakis_c_channel"` and `is_delay=True` for the active implementation; the remaining AWGN configuration branches are not supported by the current model.
 
-## 6. License
+## 5. License
 This repository is partly built on top of the code from an toy example of Turbo Autoencoder shared by a author of the paper. So please cite the original paper if you use this code in your research.
