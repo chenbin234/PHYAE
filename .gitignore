@@ -190,7 +190,7 @@ trained_models/
 *.sif
 
 # png
-*.png
+# *.png
 # pdf
 *.pdf
 # txt
