@@ -13,8 +13,7 @@ import os
 from datetime import datetime
 
 import torch
-import torch.nn as nn
-import torch.optim as optim
+from torch import nn, optim
 from torch.distributed import destroy_process_group
 from torch.utils.data import DataLoader
 from trainer import (
@@ -78,7 +77,7 @@ from models.SerialTurbo_AutoEncoder_key2 import (
 
 def make(config):
     # test dataset
-    test_dataset = InfobitDataset(num_samples=1e5, k=config.input_size)
+    test_dataset = InfobitDataset(num_samples=1e6, k=config.input_size)
 
     # create test dataloader
     test_dataloader = DataLoader(
@@ -150,15 +149,11 @@ def make(config):
         raise ValueError("Invalid loss function")
 
     # Make the loss and optimizer
-    if config.channel == "AWGN":
-        optimizer_encoder = optim.Adam(
-            model.encoder.parameters(), lr=config.learning_rate
-        )
-        optimizer_decoder = optim.Adam(
-            filter(lambda p: p.requires_grad, model.decoder.parameters()),
-            lr=config.learning_rate,
-        )
-    elif config.channel == "proakis_c_channel" and config.is_delay:
+    if (
+        config.channel == "AWGN"
+        or config.channel == "proakis_c_channel"
+        and config.is_delay
+    ):
         optimizer_encoder = optim.Adam(
             model.encoder.parameters(), lr=config.learning_rate
         )
@@ -237,22 +232,22 @@ if __name__ == "__main__":
         model_type="Turbo_AutoEncoder",
         description="Turbo Autoencoder, proakis_c_channel",
         trainable_parameters=0,
-        epochs=100,
-        num_samples=1000,
-        batch_size=1000,
-        learning_rate=1e-5,
+        epochs=1000,
+        num_samples=500,
+        batch_size=500,
+        learning_rate=1e-4,
         start_epoch=1,
         print_every=None,
-        save_every=100,
+        save_every=1000,
         in_channels=1,
         input_size=64,
         k=64,  # number of information bits
         n=64,  # code length (complex)
-        n_M=6,  #
+        n_M=5,
         F=10,
         num_iteration=6,
-        num_train_enc=100,  # Number of iterations for training the encoder in each epoch
-        num_train_dec=500,  # Number of iterations for training the decoder in each epoch
+        num_train_enc=1,  # Number of iterations for training the encoder in each epoch
+        num_train_dec=5,  # Number of iterations for training the decoder in each epoch
         dec_num_unit=100,
         dec_num_layer=5,
         add_parity_check_bit=True,  # Whether to add a parity check bit to the input of the encoder
@@ -263,13 +258,13 @@ if __name__ == "__main__":
         test_snr_high=20,  # dB
         test_snr_low=0,  # dB
         channel="proakis_c_channel",  # Channel type: "AWGN" or "proakis_c_channel"
-        max_sampling_time_offset=1.0,  # Maximum sampling time offset for pulse shaping (0.0, 0.49, or 1.0)
-        num_taps=1,  # Number of taps for the Proakis channel
+        max_sampling_time_offset=0.49,  # Maximum sampling time offset for pulse shaping (0.0, 0.49, or 1.0)
+        num_taps=5,  # Number of taps for the Proakis channel
         is_delay=True,  # Whether to include delay in the channel
         alpha=0.01,
         beta=1,
-        pretrained="./models/Turbo_AutoEncoder_20260325_13_28_38/Turbo_AutoEncoder_20260325_13_28_38_epoch700.pth",  # Path to the pretrained model： "./models/Turbo_AutoEncoder_20241205_10_38_41/Turbo_AutoEncoder_20241205_10_38_41_epoch10.pth"
-        loss_function="HybridBCESmoothMaxLoss",  # "BCE", "MSE", "ProductLoss", "MaxLoss", "SmoothMaxLoss", "LogSumExpLoss", "PNormLoss", "HybridBCESoftBLERLoss", "HybridBCEProductLoss", "HybridBCEMaxLoss", "HybridBCESmoothMaxLoss", "HybridBCELogSumExpLoss", "HybridBCEPNormLoss"
+        pretrained=None,  # Path to the pretrained model： "./models/Turbo_AutoEncoder_20241205_10_38_41/Turbo_AutoEncoder_20241205_10_38_41_epoch10.pth"
+        loss_function="BCE",  # "BCE", "MSE", "ProductLoss", "MaxLoss", "SmoothMaxLoss", "LogSumExpLoss", "PNormLoss", "HybridBCESoftBLERLoss", "HybridBCEProductLoss", "HybridBCEMaxLoss", "HybridBCESmoothMaxLoss", "HybridBCELogSumExpLoss", "HybridBCEPNormLoss"
         save_model_name=save_model_name,
         snapshot_path=f"./models/{save_model_name}" + "/" + save_model_name + "_epoch",
         use_ddp=False,

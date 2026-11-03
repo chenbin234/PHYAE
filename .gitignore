@@ -178,6 +178,7 @@ wandb/
 
 # models
 trained_models/
+*.pth
 
 # vscode settings
 # .vscode/
@@ -200,12 +201,3 @@ trained_models/
 
 # Local tools (test sources are version controlled).
 tools/
-
-# pytest HTML reports
-reports/
-
-# test folder
-/tests/*
-!/tests/sanity_check
-!/tests/__init__.py
-!/tests/report_style.css
